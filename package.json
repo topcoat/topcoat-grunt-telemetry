@@ -1,0 +1,37 @@
+{
+  "name": "topcoat-grunt-telemetry",
+  "version": "0.0.0",
+  "description": "grunt task to generate and test topcoat in telemetry",
+  "main": "Gruntfile.js",
+  "scripts": {
+    "test": "npm test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/topcoat/topcoat-grunt-telemetry.git"
+  },
+  "keywords": [
+    "topcoat",
+    "grunt",
+    "telemetry",
+    "adobe"
+  ],
+  "author": "@ndreio Andrei Oprea",
+  "license": "Apache2",
+  "dependencies": {
+    "topcoat-button": "~0.5.0",
+    "topcoat-search-input": "~0.2.0"
+  },
+  "devDependencies": {
+    "grunt": "~0.4.1",
+    "grunt-contrib-jade": "*",
+    "grunt-contrib-copy": "*",
+    "grunt-contrib-clean": "*",
+    "jade": "*",
+    "csv": "*",
+    "prompt": "*"
+  },
+  "bugs": {
+    "url": "https://github.com/topcoat/topcoat-grunt-telemetry/issues"
+  }
+}
