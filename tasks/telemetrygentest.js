@@ -2,74 +2,77 @@ var fs   = require("fs"),
     jade = require("jade"),
     path = require("path");
 
+/*
+    grunt generate task
+    read the configuration from package.json
+    scans through the array of files provided for .jade files
+    uses the template .jade and the files found to build test pages
+
+*/
 module.exports = function (grunt) {
 
-    var TELEMETRY_DIR = 'perf/page_sets/',
-        MASTER_JADE   = 'src/topcoat_telemetry.jade';
+    var options = grunt.file.readJSON('package.json').test;
 
-    grunt.registerTask('generate', 'Generates performance test', function (platform, theme) {
-
-        var perfJades = findAllPerfJadeFileInSrc();
-
-        var targetPlatform = platform || 'mobile',
-            targetTheme    = theme    || 'light';
-
+    grunt.registerTask('generate', 'Generates test pages', function () {
+        
+        if (!Object.keys(options).length) {
+            grunt.log.warn('ERROR: No options found in package.json');
+        }
+        
         var jadeCompileData = {};
 
-        grunt.util._.forEach(perfJades, function (jadePath) {
+        grunt.util._.forEach(findAllPerfJadeFileInSrc(), function (jadePath) {
 
             var jadeFileName = path.basename(jadePath).split('.')[0];
-
-            prepareJadeCompileData(jadeCompileData, jadePath, jadeFileName, targetPlatform, targetTheme);
-
+            prepareJadeCompileData(jadeCompileData, jadePath, jadeFileName);
             createTelemetryJSON(jadeFileName);
+
         });
+
         batchCompileJade(jadeCompileData);
     });
 
     var findAllPerfJadeFileInSrc = function () {
 
-        var jades = grunt.file.expand('node_modules/topcoat-*/test/perf/topcoat_*.jade');
+        var jades = grunt.file.expand(options.telemetry.files);
 
         if (jades.length === 0){
-            throw new Error("ERROR: No jade file is found in src/../test/perf/");
+            throw new Error('ERROR: No jade file is found in ' + testsPagesPath);
         }
 
         return jades;
     };
 
-    var prepareJadeCompileData = function (jadeCompileData, jadePath,
-                                           caseName, platform, theme) {
+    var prepareJadeCompileData = function (jadeCompileData, jadePath, caseName) {
 
-        var jadeContent = fs.readFileSync(jadePath, "utf8"),
-            getHtml = jade.compile(jadeContent);
-
-        var _path = jadePath.split('/')
-            , cssFile = path.join(_path[1], 'css', _path[1] + '-' + platform + '-' + theme + '.min.css')
+        var jadeContent = grunt.file.read(jadePath)
+            , getHtml = jade.compile(jadeContent)
             ;
 
-        grunt.file.exists('node_modules/' + cssFile) ? cssFile = cssFile
-            : cssFile = path.join(_path[1], 'css', _path[1] + '.min.css');
+        var _path = jadePath.split('/')
+            , cssFile = path.join(_path[1], 'css', _path[1] + '.min.css')
+            ;
+
         jadeCompileData[caseName] = {
             options: {
                 data: {
-                    platform: platform,
-                    theme: theme,
                     css: cssFile,
                     name: caseName,
-                    componentHTML: getHtml()
-                }
+                    componentHTML: getHtml(),
+                    repeats: options.telemetry.repeats
+                },
+                pretty: !options.telemetry.minified
             },
-            src:  MASTER_JADE,
-            dest: TELEMETRY_DIR + "topcoat/" + caseName + ".test.html"
+            src:  options.telemetry.template,
+            dest: "perf/page_sets/" + "topcoat/" + caseName + ".test.html"
         };
     };
 
     var createTelemetryJSON = function (caseName) {
 
         var jsonContent = {
-            "description": "Test",
-            "archive_data_file": "../data/topcoat_buttons.json",
+            "description": caseName,
+            "archive_data_file": "../data/" + caseName + ".json",
             "pages": [
                 {
                     "url": "file:///topcoat/" + caseName + ".test.html",
@@ -80,7 +83,7 @@ module.exports = function (grunt) {
             ]
         };
 
-        var jsonFilePATH = TELEMETRY_DIR + caseName + '.test.json';
+        var jsonFilePATH = "perf/page_sets/" + caseName + '.test.json';
 
         fs.writeFileSync(
             jsonFilePATH,

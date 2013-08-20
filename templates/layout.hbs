@@ -1,0 +1,16 @@
+---
+number:
+  times: "<%= options.repeat =%>"
+---
+<!doctype html>
+<html>
+<head>
+  <title></title>
+  <link rel="stylesheet" href="{{ css }}">
+</head>
+<body>
+  {{#repeat 200}}
+    {{> body }}
+  {{/repeat}}
+</body>
+</html>

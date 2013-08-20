@@ -1,6 +1,6 @@
 {
   "name": "topcoat-grunt-telemetry",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "grunt task to generate and test topcoat in telemetry",
   "main": "Gruntfile.js",
   "scripts": {
@@ -9,6 +9,14 @@
   "repository": {
     "type": "git",
     "url": "git://github.com/topcoat/topcoat-grunt-telemetry.git"
+  },
+  "test": {
+    "telemetry": {
+      "files": ["node_modules/topcoat-*/test/perf/topcoat_*.hbs"],
+      "instances": 200,
+      "minified": true,
+      "repeat": 10
+    }
   },
   "keywords": [
     "topcoat",
@@ -25,6 +33,7 @@
   "devDependencies": {
     "grunt": "~0.4.1",
     "grunt-contrib-jade": "*",
+    "assemble": "~0.4.4",
     "grunt-contrib-copy": "*",
     "grunt-contrib-clean": "*",
     "jade": "*",

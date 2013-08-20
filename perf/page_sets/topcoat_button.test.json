@@ -1,6 +1,6 @@
 {
-    "description": "Test",
-    "archive_data_file": "../data/topcoat_buttons.json",
+    "description": "topcoat_button",
+    "archive_data_file": "../data/topcoat_button.json",
     "pages": [
         {
             "url": "file:///topcoat/topcoat_button.test.html",

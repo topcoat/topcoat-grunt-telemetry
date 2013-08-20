@@ -1,5 +1,3 @@
-repeats = 200
-
 doctype 5
 html
     head
@@ -11,7 +9,7 @@ html
         |<link rel="stylesheet" type="text/css" href="#{css}">
 
     body
-        -while (repeats > 0)
-            -var repeats = repeats - 1
+        - while (repeats > 0)
+            - repeats--
             p
                 | !{componentHTML}

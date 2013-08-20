@@ -33,7 +33,7 @@ import shutil
 
 class TestHelper():
     GRUNT        = "grunt"
-    RESULTS_DIR  = "/tmp/topcoat-telemetry"
+    RESULTS_DIR  = "/tmp/"
     BROWSER	     = "system"
     BROWSER_EXEC = None
     SUBMIT_TYPE  = "SHA"
@@ -113,7 +113,6 @@ class TestHelper():
     def runTests(user_defined_test_list, how_many_rounds_to_run_the_test):
         print "runAll.py: Running telemetry tests, results in %s" % TestHelper.RESULTS_DIR
         
-        # telemetry_tests = ["loading_benchmark", "smoothness_benchmark"]
         telemetry_tests = ["loading", "smoothness"]
         topcoat_test_files = glob.glob(os.getcwd() + "/perf/page_sets/*.json")
 
@@ -149,6 +148,7 @@ class TestHelper():
         print "runAll.py: Pushing telemetry data to the server"
 
         result_files = glob.glob(TestHelper.RESULTS_DIR + "/*.txt")
+
         for rf in result_files:
 			subprocess.check_call([
                              TestHelper.GRUNT,
@@ -164,7 +164,7 @@ if __name__ == "__main__":
 
     # FIXME -- this needs to be updated
     # Usage:
-	# ./python runAll.py --platform=VALUE --theme=VALUE [--gitCWD=VALUE] [--test=VALUE] [--round=VALUE]
+	# ./python runAll.py --platform=VALUE --theme=VALUE [--gitCWD=VALUE] [--test=VALUE] [--repeat=VALUE]
     #	--platform= desktop or mobile
 	#	--theme= light or dark
 	#	[optional] --gitCWD=PATH_WHERE_YOU_WANT_TO_RUN_GIT_LOG, e.g. src/skins/button
@@ -175,26 +175,19 @@ if __name__ == "__main__":
     test_round = 1
 
     args = sys.argv[1:]
+    
+    print args
 
     for arg in args:
         arg_key, arg_val = arg.split('=')
-        if arg_key == '--platform':
-            platfrm = arg_val
-        elif arg_key == '--theme':
-            theme = arg_val
-        elif arg_key == '--gitCWD':
-            git_cwd = arg_val
-        elif arg_key == '--test':
+        if arg_key == '--test':
             test_list = arg_val.split(',')
-        elif arg_key == '--round':
+        elif arg_key == '--repeat':
             test_round = int(arg_val)
         elif arg_key == '--type':
             TestHelper.SUBMIT_TYPE = arg_val
         else:
             print "%s is not recognized."
-
-    if not platform or not theme:
-        raise RuntimeError("ERROR: --platform and --theme must be set.")
 
     if not git_cwd:
         git_cwd = ''

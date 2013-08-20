@@ -12,11 +12,18 @@ module.exports = function(grunt) {
 					{ expand: true, src: ['perf/**'], dest: path.join(chromiumSrc, '/tools/') },
 					{ expand: true, cwd: 'node_modules', src: ['topcoat-*/**'], dest: path.join(chromiumSrc, 'tools/perf/page_sets/topcoat/') }
 				]
+			},
+			options: {
+				force: true
 			}
 		},
 		clean: {
 			telemetry: {
-				src : ['perf/page_sets/*', chromiumSrc + '/tools/perf/page_sets/topcoat', chromiumSrc + '/tools/perf/page_sets/topcoat_*.json'],
+				src : [
+					'perf/page_sets/*', chromiumSrc + '/tools/perf/page_sets/topcoat',
+					chromiumSrc + '/tools/perf/page_sets/topcoat_*.json',
+					'/tmp/topcoat-telemetry'
+				],
 				options: {
 					force: true
 				}
@@ -26,28 +33,12 @@ module.exports = function(grunt) {
 
 	grunt.loadTasks('tasks/');
 	grunt.loadNpmTasks('grunt-contrib-jade');
+	grunt.loadNpmTasks('assemble');
 	grunt.loadNpmTasks('grunt-contrib-copy');
 	grunt.loadNpmTasks('grunt-contrib-clean');
 
-	grunt.registerTask('default', ['src', 'generate', 'copy']);
-
-	grunt.registerTask('run', 'Run telemetry tests', function () {
-		var exec = require("child_process").exec,
-            commandToBeExecuted = 'python bin/runAll.py --platform=mobile --theme=light --type=snapshot',
-            done = this.async();
-
-        exec(commandToBeExecuted, function(error, stdout, stderr) {
-        	if (error) {
-                grunt.log.error('Error');
-                console.log(error);
-                done();
-            } else {
-            	console.log(stdout);
-            	grunt.log.writeln('Done!');
-            }
-        });
-
-	});
+	grunt.registerTask('default', ['src', 'assemble-build', 'copy']);
+	grunt.registerTask('telemetry', ['run:telemetry:snapshot', 'clean']);
 
 	grunt.registerTask('src', "Check & store CHROMIUM_SRC env var", function() {
 		if (!chromiumSrc) {
