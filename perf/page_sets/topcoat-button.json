@@ -1,0 +1,12 @@
+{
+    "description": "topcoat-button",
+    "archive_data_file": "../data/topcoat-button.json",
+    "pages": [
+        {
+            "url": "file:///topcoat/topcoat-button.test.html",
+            "smoothness": {
+                "action": "scroll"
+            }
+        }
+    ]
+}

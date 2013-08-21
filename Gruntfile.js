@@ -28,12 +28,26 @@ module.exports = function(grunt) {
 					force: true
 				}
 			}
-		}
+		},
+		htmlmin: {
+            telemetry: {
+                options: {
+                    removeComments: true,
+                    collapseWhitespace: true
+                },
+                files: [{
+                    expand: true,
+                    src: ['perf/page_sets/topcoat/*.html'],
+                    dest: '.',
+                    ext: '.test.html',
+                }],
+            },
+        }
 	});
 
 	grunt.loadTasks('tasks/');
-	grunt.loadNpmTasks('grunt-contrib-jade');
 	grunt.loadNpmTasks('assemble');
+	grunt.loadNpmTasks('grunt-contrib-htmlmin');
 	grunt.loadNpmTasks('grunt-contrib-copy');
 	grunt.loadNpmTasks('grunt-contrib-clean');
 
