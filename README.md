@@ -14,7 +14,8 @@
       ],
       "css": [
         // see below for explanation
-      	 "css/*.css"
+      	"/../css/*mobile-light.min.css",
+        "/../css/*.min.css"
       ]
       // how many time should the component 
       // be repeated in the page
@@ -29,14 +30,6 @@
 
 ####  CSS path
 
-By default it assumes this hierarchy.
-
-````
-root
-	├── css/*
-	index.html
-````
-
 The parameter must be relative to the index.html page. 
 Take for example this hierarchy
 
@@ -46,7 +39,9 @@ root
 	├── test/button.html
 ````
 
-The parameter must be `../css/*.css`
+The parameter must be `/../css/*.css`
+
+An array of parameters means that if the first does not match it will try the next.
 
 #### Layout
 

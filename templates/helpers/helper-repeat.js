@@ -10,7 +10,6 @@ module.exports.register = register = function(Handlebars, options) {
    *    {{/repeat}}
    */
   Handlebars.registerHelper('repeat', function(n, context) {
-    console.log('repeat ' + n + ' times');
     var times = '';
     for (var i = 0; i < n; ++i) {
       times += context.fn(this);

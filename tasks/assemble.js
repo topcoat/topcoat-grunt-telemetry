@@ -1,4 +1,7 @@
 var path = require('path');
+var _;
+var expand;
+var write;
 
 // p = /node_modules/topcoat-button/index.html
 // => topcoat-button 
@@ -8,14 +11,16 @@ function dirName (p) {
 }
 
 // creates json file for Telemetry
-var createTelemetryJSON = function (caseName, grunt) {
+var createTelemetryJSON = function (caseName, min) {
+
+	var minified = min ? '.test.' : '';
 
 	var jsonContent = {
 		"description": caseName,
 		"archive_data_file": "../data/" + caseName + ".json",
 		"pages": [
 			{
-				"url": "file:///topcoat/" + caseName + ".test.html",
+				"url": "file:///topcoat/" + caseName + minified + "html",
 				"smoothness": {
 					"action": "scroll"
 				}
@@ -25,15 +30,38 @@ var createTelemetryJSON = function (caseName, grunt) {
 
 	var jsonFilePATH = "perf/page_sets/" + caseName + '.json';
 
-	grunt.file.write(
-		jsonFilePATH,
+	write(jsonFilePATH,
 		JSON.stringify(jsonContent, null, 4),
 		'utf8');
 };
 
+function relativeCSSPath (file, options, grunt) {
+
+	var cssPath;
+
+	if (typeof options == 'string') {
+		var match = expand(path.join(file + options[i]));
+		cssPath = _.rest(match[0].split('/')).join('/');
+	} else {
+		for (var i = 0; i < options.length && !cssPath; ++i) {
+			var match = expand(path.join(file + options[i]));
+			if (match.length) {
+				// drop the node_modules prefix
+				cssPath = _.rest(match[0].split('/')).join('/');
+			}
+		}
+		
+	}
+
+	return cssPath;
+
+}
+
 module.exports = function (grunt) {
 
-	var _ = grunt.util._;
+	_ = grunt.util._;
+	expand = grunt.file.expand;
+	write = grunt.file.write;
 
 	grunt.registerTask('assemble-build', 'Generates test pages', function () {
 
@@ -53,8 +81,6 @@ module.exports = function (grunt) {
 			}
 		};
 
-		console.log(pkgOptions.telemetry.instances);
-
 		// components is an array that will contain all the files
 		// that match the pattern specified in the package.json
 		// they are the pages that will be build for testing
@@ -65,17 +91,16 @@ module.exports = function (grunt) {
 			// c = each file to be turned in a test page
 			// cssPath = relative URL for the page css
 
-			var cssPath = grunt.file.expand(path.join(c + pkgOptions.telemetry.css[0]));
-			if(!cssPath.length)
-				cssPath = grunt.file.expand(path.join(c + pkgOptions.telemetry.css[1]));
+			var cssPath = relativeCSSPath(c, pkgOptions.telemetry.css)
+				, fname = 'perf/page_sets/topcoat/' + dirName(c)
+				;
 
-			var fname = 'perf/page_sets/topcoat/' + dirName(c);
-			createTelemetryJSON(dirName(c), grunt);
+			createTelemetryJSON(dirName(c), pkgOptions.telemetry.minified);
 
 			options[dirName(c) + '.html'] = {
 				files: {},
 				options: {
-					style: _.rest(cssPath[0].split('/')).join('/')
+					style: cssPath
 				}
 			}
 			options[dirName(c) + '.html'].files[fname] = c;

@@ -19,9 +19,9 @@
         "/../css/*mobile-light.min.css",
         "/../css/*.min.css"
       ],
-      "instances": 50,
-      "minified": false,
-      "repeat": 10
+      "instances": 5,
+      "minified": true,
+      "repeat": 1
     }
   },
   "keywords": [
