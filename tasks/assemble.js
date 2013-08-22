@@ -19,7 +19,7 @@ var createTelemetryJSON = function (caseName, min) {
 		"archive_data_file": "../data/" + caseName + ".json",
 		"pages": [
 			{
-				"url": "file:///topcoat/" + caseName + minified + "html",
+				"url": "file:///topcoat/" + caseName + minified + ".html",
 				"smoothness": {
 					"action": "scroll"
 				}
@@ -109,6 +109,10 @@ module.exports = function (grunt) {
 				}
 			}
 			assembleConfigs[path.basename(c)].files[fname] = c;
+			copyOpt.telemetry.files.push({
+				src: cssPath,
+				dest: path.join(chromiumSrc, '/tools/perf/page_sets/topcoat/')
+			})
 		});
 
 		grunt.config('copy', copyOpt);

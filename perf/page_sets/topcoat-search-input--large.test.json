@@ -1,0 +1,12 @@
+{
+    "description": "topcoat-search-input--large.test",
+    "archive_data_file": "../data/topcoat-search-input--large.test.json",
+    "pages": [
+        {
+            "url": "file:///topcoat/topcoat-search-input--large.test.html",
+            "smoothness": {
+                "action": "scroll"
+            }
+        }
+    ]
+}
