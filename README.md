@@ -8,14 +8,11 @@
     "telemetry": {
       "files": [
         // pattern after which to match the test files
-        // must be in a folder under node_modules
-        // will be fixed
         "node_modules/topcoat-*/index.html"
       ],
       "css": [
         // see below for explanation
-      	"/../css/*mobile-light.min.css",
-        "/../css/*.min.css"
+      	 "css/*.css"
       ]
       // how many time should the component 
       // be repeated in the page
@@ -23,12 +20,20 @@
       // minified test file or not
       "minified": true,
       // how many times should each test run
-      "repeat": 10
+      "repeat": 10      
     }
   }
   ````
 
 ####  CSS path
+
+By default it assumes this hierarchy.
+
+````
+root
+	├── css/*
+	index.html
+````
 
 The parameter must be relative to the index.html page. 
 Take for example this hierarchy
@@ -39,9 +44,7 @@ root
 	├── test/button.html
 ````
 
-The parameter must be `/../css/*.css`
-
-An array of parameters means that if the first does not match it will try the next.
+The parameter must be `../css/*.css`
 
 #### Layout
 
@@ -53,8 +56,8 @@ An array of parameters means that if the first does not match it will try the ne
   <link rel="stylesheet" href="{{ style }}">
 </head>
 <body>
-  {{#repeat instances}} // repeats the html
-    {{#extract}} // extracts the body
+  {{#repeat instances}}
+    {{#extract}}
       {{> body }}
     {{/extract}}
   {{/repeat}}

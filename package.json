@@ -10,20 +10,6 @@
     "type": "git",
     "url": "git://github.com/topcoat/topcoat-grunt-telemetry.git"
   },
-  "test": {
-    "telemetry": {
-      "files": [
-        "node_modules/topcoat-*/index.html"
-      ],
-      "css": [
-        "/../css/*mobile-light.min.css",
-        "/../css/*.min.css"
-      ],
-      "instances": 5,
-      "minified": true,
-      "repeat": 1
-    }
-  },
   "keywords": [
     "topcoat",
     "grunt",

@@ -6,7 +6,7 @@ module.exports = function (grunt) {
 
 		var args = _.toArray(arguments)
 			, done = this.async()
-			, pkgOptions = grunt.file.readJSON('package.json').test
+			, pkgOptions = grunt.config('telemetry')
 			;
 
 		if(args[0] == 'telemetry') {
@@ -25,7 +25,7 @@ module.exports = function (grunt) {
 				_.forEach(_.zip(params, _.rest(args)), function (param) {
 					commandToBeExecuted += param.join('=') + ' ';
 				});
-				commandToBeExecuted += '--repeat=' + pkgOptions.telemetry.repeat;
+				commandToBeExecuted += '--repeat=' + pkgOptions.repeat;
 			}
 
 			exec(commandToBeExecuted, function(error, stdout, stderr) {

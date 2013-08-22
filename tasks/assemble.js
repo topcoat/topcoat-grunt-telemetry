@@ -3,11 +3,10 @@ var _;
 var expand;
 var write;
 
-// p = /node_modules/topcoat-button/index.html
-// => topcoat-button 
-function dirName (p) {
-	p = path.dirname(p).split(path.sep);
-	return p[p.length-1];
+function checkDuplicates (pattern) {
+	return function (p) {
+		return path.basename(p).match(path.basename(pattern));
+	}
 }
 
 // creates json file for Telemetry
@@ -35,26 +34,33 @@ var createTelemetryJSON = function (caseName, min) {
 		'utf8');
 };
 
-function relativeCSSPath (file, options, grunt) {
+function relativeCSSPath (file, options) {
 
-	var cssPath;
+	var cssPath = null;
 
 	if (typeof options == 'string') {
 		var match = expand(path.join(file + options[i]));
-		cssPath = _.rest(match[0].split('/')).join('/');
+		cssPath = match.length ? match[0] : null;
 	} else {
 		for (var i = 0; i < options.length && !cssPath; ++i) {
+
+			// console.log(expand(path.resolve(file + options[i])),expand(file + options[i]));
+			
 			var match = expand(path.join(file + options[i]));
+			console.log(match);
 			if (match.length) {
-				// drop the node_modules prefix
-				cssPath = _.rest(match[0].split('/')).join('/');
+				cssPath = match[0];
 			}
 		}
 		
 	}
 
-	return cssPath;
+	if (!cssPath) {
+		console.log('No CSS match for',file);
+		return '';
+	}
 
+	return cssPath;
 }
 
 module.exports = function (grunt) {
@@ -65,51 +71,51 @@ module.exports = function (grunt) {
 
 	grunt.registerTask('assemble-build', 'Generates test pages', function () {
 
-		var pkgOptions = grunt.file.readJSON('package.json').test;
+		var pkgOptions = grunt.config('telemetry');
+		var assembleConfigs = grunt.config('assemble');
+		var chromiumSrc = process.env.CHROMIUM_SRC;
 
-		var options = {
-			options: {
-				prettify: {
-					indent: 2
-				},
-				flatten: true,
-				minified: true,
-				layoutdir: 'templates',
-				layout: 'layout.hbs',
-				helpers: 'templates/helpers/*.js',
-				instances: pkgOptions.telemetry.instances
-			}
-		};
+		// assign the instances variable to assemble
+		// that will include the variable several times
+		// in the page
+		assembleConfigs.options.instances = pkgOptions.instances;
 
 		// components is an array that will contain all the files
 		// that match the pattern specified in the package.json
 		// they are the pages that will be build for testing
-		var components = grunt.file.expand(pkgOptions.telemetry.files);
-		components.forEach(function (c) {
-			// FIXME -- too hacky
+		var components = grunt.file.expand(pkgOptions.files);
+		var copyOpt = grunt.config('copy');
+
+		components.forEach(function (c, idx) {
+
+			if (components.filter(checkDuplicates(c)).length > 1) {
+				grunt.log.warn('You have multiple files with the same name');
+				grunt.log.warn(components.filter(checkDuplicates(c)));
+			}
 
 			// c = each file to be turned in a test page
 			// cssPath = relative URL for the page css
 
-			var cssPath = relativeCSSPath(c, pkgOptions.telemetry.css)
-				, fname = 'perf/page_sets/topcoat/' + dirName(c)
+			var cssPath = relativeCSSPath(c, pkgOptions.css)
+				, fname = 'perf/page_sets/topcoat/' + path.basename(c)
 				;
 
-			createTelemetryJSON(dirName(c), pkgOptions.telemetry.minified);
+			createTelemetryJSON(path.basename(c, '.html'), pkgOptions.minified);
 
-			options[dirName(c) + '.html'] = {
+			assembleConfigs[path.basename(c)] = {
 				files: {},
 				options: {
 					style: cssPath
 				}
 			}
-			options[dirName(c) + '.html'].files[fname] = c;
+			assembleConfigs[path.basename(c)].files[fname] = c;
 		});
 
-		grunt.config('assemble', options);
+		grunt.config('copy', copyOpt);
+		grunt.config('assemble', assembleConfigs);
 		grunt.task.run('assemble');
 
-		if (pkgOptions.telemetry.minified) {
+		if (pkgOptions.minified) {
 			grunt.task.run('htmlmin');
 		}
 

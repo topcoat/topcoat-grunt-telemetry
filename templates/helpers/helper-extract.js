@@ -10,7 +10,8 @@ module.exports.register = register = function(Handlebars, options) {
    */
   Handlebars.registerHelper('extract', function(context) {
     var pattern = /<body[^>]*>((.|[\n\r])*)<\/body>/im;
-    return pattern.exec(context.fn(this))[1];
+    var result = pattern.exec(context.fn(this));
+    return result ? pattern.exec(context.fn(this))[1] : context.fn(this);
   });
 
 };
