@@ -22,7 +22,8 @@ module.exports = function(grunt) {
 					'perf/page_sets/*', chromiumSrc + '/tools/perf/page_sets/topcoat',
 					chromiumSrc + '/tools/perf/page_sets/topcoat_*.json',
 					'/tmp/loading*',
-					'/tmp/smoothness*'
+					'/tmp/smoothness*',
+					'node_modules/**/*perf*.html'
 				],
 				options: {
 					force: true
@@ -56,12 +57,11 @@ module.exports = function(grunt) {
 			}
 		},
 		telemetry: {
-			files: [
-				"node_modules/topcoat-*/test/perf/*.html"
+			parentDir: [
+				"node_modules/topcoat-*/"
 				],
-			css: [
-				"/../../../css/*.css",
-				"/../../../css/*.css"
+			testPages: [
+				"test/perf/*.html"
 			],
 			instances: 10,
 			minified: false,
