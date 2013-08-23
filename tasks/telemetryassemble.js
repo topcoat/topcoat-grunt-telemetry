@@ -3,16 +3,16 @@ var   path = require('path')
 	;
 
 // creates json file for Telemetry
-var createTelemetryJSON = function (page, min) {
+var createTelemetryJSON = function (filename, min) {
 
-	var   jsonFilePATH = "perf/page_sets/" + name + '.json'
-		, name = path.basename(page)
-		, jsonContent = {
+	var name = path.basename(filename)
+	var jsonFilePATH = "perf/page_sets/" + name + '.json'
+	var jsonContent = {
 		"description": name,
 		"archive_data_file": "../data/" + name + ".json",
 		"pages": [
 			{
-				"url": "file:///topcoat/" + page,
+				"url": "file:///topcoat/" + filename,
 				"smoothness": {
 					"action": "scroll"
 				}
@@ -51,15 +51,24 @@ module.exports = function (grunt) {
 				if (matches.length) {
 
 					copyOpt.telemetry.files.push({
-						src: dir,
+						expand: true,
+						src: dir + '/**',
 						dest: path.join(chromiumSrc, '/tools/perf/page_sets/topcoat/')
 					});
 
 					matches.forEach(function (f) {
 
-						createTelemetryJSON(f, pkgOptions.minified);
+						var filename = dir + path.basename(f) + '.perf.html';
+
+						createTelemetryJSON(filename, pkgOptions.minified);
+
 						assembleConfigs[path.basename(f)] = { files: {} }
-						assembleConfigs[path.basename(f)].files[f + '.perf.html'] = f;
+						assembleConfigs[path.basename(f)].files[filename] = f;
+
+						var css = grunt.file.expand(dir + pkgOptions.css)[0];
+						assembleConfigs[path.basename(f)].options = {
+							style: path.relative(dir, css)
+						}
 
 					});
 

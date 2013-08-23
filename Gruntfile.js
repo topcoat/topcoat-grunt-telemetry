@@ -61,8 +61,10 @@ module.exports = function(grunt) {
 				"node_modules/topcoat-*/"
 				],
 			testPages: [
-				"test/perf/*.html"
+				"test/perf/*.html",
+				"!*perf*"
 			],
+			css: "/css/*.css",
 			instances: 10,
 			minified: false,
 			repeat: 1
