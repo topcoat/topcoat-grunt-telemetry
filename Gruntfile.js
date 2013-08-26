@@ -23,7 +23,8 @@ module.exports = function(grunt) {
 					chromiumSrc + '/tools/perf/page_sets/topcoat_*.json',
 					'/tmp/loading*',
 					'/tmp/smoothness*',
-					'node_modules/**/*perf*.html'
+					'node_modules/**/*perf*.html',
+					'node_modules/**/*.test.html'
 				],
 				options: {
 					force: true
@@ -38,7 +39,7 @@ module.exports = function(grunt) {
                 },
                 files: [{
                     expand: true,
-                    src: ['perf/page_sets/topcoat/*.html'],
+                    src: ['node_modules/bootstrap-buttons/*.perf.html'],
                     dest: '.',
                     ext: '.test.html',
                 }],
@@ -58,16 +59,21 @@ module.exports = function(grunt) {
 		},
 		telemetry: {
 			parentDir: [
-				"node_modules/topcoat-*/"
+				"node_modules/topcoat-button/",
+				"node_modules/bootstrap-buttons/"
 				],
 			testPages: [
-				"test/perf/*.html",
+				"/test/perf/*.html",
+				"buttons.html",
 				"!*perf*"
 			],
-			css: "/css/*.css",
-			instances: 10,
-			minified: false,
-			repeat: 1
+			css: [
+				"/css/*mobile-light.css",
+				"*.css"
+			],
+			instances: 200,
+			minified: true,
+			repeat: 10
 		}
 	});
 

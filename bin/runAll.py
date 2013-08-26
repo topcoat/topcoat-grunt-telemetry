@@ -29,14 +29,16 @@ import subprocess
 import glob
 import platform
 import shutil
+import time
 
 
 class TestHelper():
     GRUNT        = "grunt"
     RESULTS_DIR  = "/tmp/"
-    BROWSER	     = "system"
+    BROWSER      = "system"
     BROWSER_EXEC = None
     SUBMIT_TYPE  = "SHA"
+    GROUP_RESULTS = False
     
     CHROMIUM_SRC = os.environ.get("CHROMIUM_SRC")
     DEVICE_NAME  = os.environ.get("DEVICE_NAME")
@@ -122,7 +124,7 @@ class TestHelper():
                    # TestHelper.CHROMIUM_SRC + "/tools/perf/run_multipage_benchmarks",
                    TestHelper.CHROMIUM_SRC + "/tools/perf/run_measurement",
                    # "--browser=" + TestHelper.BROWSER,
-                   "--browser=canary",
+                   "--browser=system",
                    "--output-format=csv",
                    telemetry_test,
                    TestHelper.CHROMIUM_SRC + "tools/perf/page_sets/%s" % topcoat_test_file,
@@ -140,8 +142,8 @@ class TestHelper():
 
             for telemetry_test in telemetry_tests:
                 for test_round in range(how_many_rounds_to_run_the_test):
-					cmd = genCmd()
-					subprocess.check_call(cmd)
+                    cmd = genCmd()
+                    subprocess.check_call(cmd)
     
     @staticmethod
     def submitResults(git_cwd):
@@ -149,27 +151,33 @@ class TestHelper():
 
         result_files = glob.glob(TestHelper.RESULTS_DIR + "/*.txt")
 
+
+        timestamp = str(int(time.time()))
+
         for rf in result_files:
-			subprocess.check_call([
+            if not TestHelper.GROUP_RESULTS:
+                timestamp = int(time.time())
+
+            subprocess.check_call([
                              TestHelper.GRUNT,
                              "telemetry-submit:" + git_cwd,
                              "--path="   + rf,
                              "--device=" + TestHelper.DEVICE_NAME,
                              "--test="   + rf.split(os.sep)[-1][:-6],
-                             "--type="   + TestHelper.SUBMIT_TYPE
+                             "--type="   + TestHelper.SUBMIT_TYPE,
+                             "--group=" + timestamp
                              ])
-
 
 if __name__ == "__main__":
 
     # FIXME -- this needs to be updated
     # Usage:
-	# ./python runAll.py --platform=VALUE --theme=VALUE [--gitCWD=VALUE] [--test=VALUE] [--repeat=VALUE]
-    #	--platform= desktop or mobile
-	#	--theme= light or dark
-	#	[optional] --gitCWD=PATH_WHERE_YOU_WANT_TO_RUN_GIT_LOG, e.g. src/skins/button
-	#	[optional] --test=ONE_OR_MORE_TESTS_YOU_WANT_TO_RUN, e.g. topcoat_button.test.json
-	#	[optional] --test=HOW_MANY_ROUNDS_TO_RUN_THE_TEST, default is 1.
+    # ./python runAll.py --platform=VALUE --theme=VALUE [--gitCWD=VALUE] [--test=VALUE] [--repeat=VALUE]
+    #   --platform= desktop or mobile
+    #   --theme= light or dark
+    #   [optional] --gitCWD=PATH_WHERE_YOU_WANT_TO_RUN_GIT_LOG, e.g. src/skins/button
+    #   [optional] --test=ONE_OR_MORE_TESTS_YOU_WANT_TO_RUN, e.g. topcoat_button.test.json
+    #   [optional] --test=HOW_MANY_ROUNDS_TO_RUN_THE_TEST, default is 1.
 
     platfrm = theme = git_cwd = test_list = None
     test_round = 1
@@ -186,6 +194,8 @@ if __name__ == "__main__":
             test_round = int(arg_val)
         elif arg_key == '--type':
             TestHelper.SUBMIT_TYPE = arg_val
+        elif arg_key == '--group':
+            TestHelper.GROUP_RESULTS = arg_val
         else:
             print "%s is not recognized."
 

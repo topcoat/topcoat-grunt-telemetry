@@ -26,9 +26,18 @@ var createTelemetryJSON = function (filename, min) {
 
 };
 
+function getCSSFile (dir, cssFiles) {
+	return cssFiles.map(function (f) {
+		return expand(dir + f)[0];
+	}).filter(function (x) {
+		return x;
+	})[0];
+}
+
 module.exports = function (grunt) {
 
 	write = grunt.file.write;
+	expand = grunt.file.expand;
 
 	grunt.registerTask('assemble-build', 'Generates test pages', function () {
 
@@ -42,7 +51,7 @@ module.exports = function (grunt) {
 			;
 
 		assembleConfigs.options.instances = pkgOptions.instances;
-
+		
 		parentDir.forEach(function (dir) {
 			pkgOptions.testPages.forEach(function (pattern) {
 
@@ -65,11 +74,11 @@ module.exports = function (grunt) {
 						assembleConfigs[path.basename(f)] = { files: {} }
 						assembleConfigs[path.basename(f)].files[filename] = f;
 
-						var css = grunt.file.expand(dir + pkgOptions.css)[0];
+						var css = getCSSFile(dir, pkgOptions.css);
+
 						assembleConfigs[path.basename(f)].options = {
 							style: path.relative(dir, css)
 						}
-
 					});
 
 				}

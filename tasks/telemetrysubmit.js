@@ -50,6 +50,7 @@ module.exports = function(grunt) {
                 ,   port = process.env.TOPCOAT_BENCHMARK_PORT
                 ,   type = grunt.option('type')
                 ,   date = grunt.option('date')
+                ,   group = grunt.option('group')
                 ,   snapshot
                 ,   submitData = require('../lib/submitData')
                 ,   fileName = require('../lib/extractFileName')
@@ -88,7 +89,8 @@ module.exports = function(grunt) {
                     submitData(stdout, path, {
                         device: device,
                         test: test,
-                        type: type
+                        type: type,
+                        group: group
                     }, {
                         host : host,
                         port : port

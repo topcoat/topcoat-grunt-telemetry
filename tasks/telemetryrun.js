@@ -13,7 +13,7 @@ module.exports = function (grunt) {
 
 			var exec = require('child_process').exec
 				, commandToBeExecuted = 'python bin/runAll.py '
-				, params = ['--type']
+				, params = ['--type', '--group']
 				;
 
 			// If parameters are sent but do not match the expected number
