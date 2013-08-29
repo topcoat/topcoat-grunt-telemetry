@@ -1,12 +1,17 @@
 var   path = require('path')
 	, write
+    , expand
 	;
 
 // creates json file for Telemetry
-var createTelemetryJSON = function (filename, min) {
+// points to the perf html page
+// defines all the interactions with the page
+function createTelemetryJSON (filename, min) {
 
 	var name = path.basename(filename)
-	var jsonFilePATH = "perf/page_sets/" + name + '.json'
+      , jsonFilePATH = "perf/page_sets/" + name + '.json'
+      ;
+
 	var jsonContent = {
 		"description": name,
 		"archive_data_file": "../data/" + name + ".json",
@@ -24,8 +29,11 @@ var createTelemetryJSON = function (filename, min) {
 		JSON.stringify(jsonContent, null, 4),
 		'utf8');
 
-};
+}
 
+// Expands pattern that points to the CSS folder
+// Get the very first css file it finds
+// Not ideal. Up to the user to provide an accurate pattern
 function getCSSFile (dir, cssFiles) {
 	return cssFiles.map(function (f) {
 		return expand(dir + f)[0];
@@ -41,8 +49,6 @@ module.exports = function (grunt) {
 
 	grunt.registerTask('assemble-build', 'Generates test pages', function () {
 
-		if (!chromiumSrc) grunt.task.run('src');
-
 		var   pkgOptions  = grunt.config('telemetry')
 			, copyOpt     = grunt.config('copy')
 			, parentDir   = grunt.file.expand(pkgOptions.parentDir)
@@ -50,13 +56,21 @@ module.exports = function (grunt) {
 			, assembleConfigs = grunt.config('assemble')
 			;
 
+        // Pass over the configurations to assemble
+        // instances tells assemble how many times to repeat a component
 		assembleConfigs.options.instances = pkgOptions.instances;
+        
+        // All benchmark pages generated have a .perf. suffix
+        // They are ignored to keep the Grunt task from looping
+        pkgOptions.testPages.push("!*perf*");
 		
+        // Checks all the parent dirs for perf file matches
 		parentDir.forEach(function (dir) {
 			pkgOptions.testPages.forEach(function (pattern) {
 
 				var matches = grunt.file.expand(dir + pattern);
 
+                // If found parent dir will be copied to telemetry
 				if (matches.length) {
 
 					copyOpt.telemetry.files.push({
@@ -69,16 +83,18 @@ module.exports = function (grunt) {
 
 						var filename = dir + path.basename(f) + '.perf.html';
 
+                        // Generate json file that points to perf html page
 						createTelemetryJSON(filename, pkgOptions.minified);
-
-						assembleConfigs[path.basename(f)] = { files: {} }
+                        
+                        // tell assemble to create the perf page
+						assembleConfigs[path.basename(f)] = { files: {} };
 						assembleConfigs[path.basename(f)].files[filename] = f;
 
+                        // find the relative path to the CSS for the perf page
 						var css = getCSSFile(dir, pkgOptions.css);
-
 						assembleConfigs[path.basename(f)].options = {
 							style: path.relative(dir, css)
-						}
+						};
 					});
 
 				}

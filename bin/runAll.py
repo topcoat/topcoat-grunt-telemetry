@@ -137,7 +137,7 @@ class TestHelper():
 
         for tf in topcoat_test_files:
             topcoat_test_file = tf.split(os.sep)[-1]
-            topcoat_test_name = topcoat_test_file.split(".")[0]
+            topcoat_test_name = "_".join([topcoat_test_file.split(".")[0], topcoat_test_file.split(".")[1]])
             print "runAll.py: Running tests for %s" % topcoat_test_name
 
             for telemetry_test in telemetry_tests:

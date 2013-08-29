@@ -23,8 +23,7 @@ module.exports = function(grunt) {
 					chromiumSrc + '/tools/perf/page_sets/topcoat_*.json',
 					'/tmp/loading*',
 					'/tmp/smoothness*',
-					'node_modules/**/*perf*.html',
-					'node_modules/**/*.test.html'
+					'node_modules/**/*perf*.html'
 				],
 				options: {
 					force: true
@@ -59,21 +58,18 @@ module.exports = function(grunt) {
 		},
 		telemetry: {
 			parentDir: [
-				"node_modules/topcoat-button/",
-				"node_modules/bootstrap-buttons/"
+				"node_modules/topcoat-button-no-shadow/",
+				"node_modules/topcoat-button-box-shadow/"
 				],
 			testPages: [
-				"/test/perf/*.html",
-				"buttons.html",
-				"!*perf*"
+				"/test/perf/*.html"
 			],
 			css: [
-				"/css/*mobile-light.css",
-				"*.css"
+				"/css/*mobile-light.css"
 			],
-			instances: 200,
+			instances: 400,
 			minified: true,
-			repeat: 10
+			repeat: 1
 		}
 	});
 
@@ -84,7 +80,7 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-clean');
 
 	grunt.registerTask('default', ['src', 'assemble-build', 'copy']);
-	grunt.registerTask('telemetry', ['run:telemetry:snapshot']);
+	grunt.registerTask('telemetry', ['run:telemetry:snapshot:True']);
 
 	grunt.registerTask('src', "Check & store CHROMIUM_SRC env var", function() {
 		if (!chromiumSrc) {
