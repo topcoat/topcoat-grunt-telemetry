@@ -115,14 +115,13 @@ class TestHelper():
     def runTests(user_defined_test_list, how_many_rounds_to_run_the_test):
         print "runAll.py: Running telemetry tests, results in %s" % TestHelper.RESULTS_DIR
         
-        telemetry_tests = ["loading", "smoothness"]
+        telemetry_tests = ["loading_benchmark", "smoothness_benchmark"]
         topcoat_test_files = glob.glob(os.getcwd() + "/perf/page_sets/*.json")
 
         def genCmd():
             cmd = [
                    "python",
-                   # TestHelper.CHROMIUM_SRC + "/tools/perf/run_multipage_benchmarks",
-                   TestHelper.CHROMIUM_SRC + "/tools/perf/run_measurement",
+                   TestHelper.CHROMIUM_SRC + "/tools/perf/run_multipage_benchmarks",
                    # "--browser=" + TestHelper.BROWSER,
                    "--browser=system",
                    "--output-format=csv",
@@ -204,4 +203,4 @@ if __name__ == "__main__":
 
     TestHelper.init(platfrm, theme)
     TestHelper.runTests(test_list, test_round)
-    TestHelper.submitResults(git_cwd)
+    # TestHelper.submitResults(git_cwd)

@@ -1,4 +1,4 @@
-var chromiumSrc = process.env.CHROMIUM_SRC || ''
+var chromiumSrc = process.env.CHROMIUM_SRC || '/home/andrei/chromium/src/'
 	, prompt = require('prompt')
 	, path = require('path')
 	;
@@ -82,7 +82,7 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-clean');
 	grunt.loadNpmTasks('grunt-simple-mocha');
 
-	grunt.registerTask('default', ['src', 'assemble-build', 'copy']);
+	grunt.registerTask('default', ['assemble-build']);
 	grunt.registerTask('telemetry', ['run:telemetry:snapshot:True']);
 	grunt.registerTask('test', ['simplemocha:run_task', 'simplemocha:page_sets'])
 

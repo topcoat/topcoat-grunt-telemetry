@@ -53,9 +53,12 @@ module.exports = function (grunt) {
 			, copyOpt     = grunt.config('copy')
 			, minOpt 	  = grunt.config('htmlmin')
 			, parentDir   = grunt.file.expand(pkgOptions.parentDir)
-			, chromiumSrc = process.env.CHROMIUM_SRC || ''
+			, chromiumSrc = process.env.CHROMIUM_SRC
 			, assembleConfigs = grunt.config('assemble')
 			;
+
+		if (!chromiumSrc)
+			chromiumSrc = '/home/andrei/chromium/src/';
 
         // Pass over the configurations to assemble
         // instances tells assemble how many times to repeat a component
@@ -90,14 +93,15 @@ module.exports = function (grunt) {
 
 					matches.forEach(function (f) {
 
-						var filename = dir + path.basename(f) + '.perf.html';
-
+						var filename = path.join(path.dirname(f),path.basename(f, '.html') + '.perf.html');
+						console.log(filename);
                         // Generate json file that points to perf html page
-						createTelemetryJSON(filename, pkgOptions.minified);
+						createTelemetryJSON(path.join(dir, path.basename(filename)), pkgOptions.minified);
                         
                         // tell assemble to create the perf page
 						assembleConfigs[path.basename(f)] = { files: {} };
 						assembleConfigs[path.basename(f)].files[filename] = f;
+						//console.log(assembleConfigs);
 
                         // find the relative path to the CSS for the perf page
 						var css = getCSSFile(dir, pkgOptions.css);
@@ -111,6 +115,7 @@ module.exports = function (grunt) {
 		});
 
 		grunt.config('copy', copyOpt);
+
 		grunt.config('assemble', assembleConfigs);
 
 		grunt.task.run('assemble');
