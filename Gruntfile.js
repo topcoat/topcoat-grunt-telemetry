@@ -36,12 +36,7 @@ module.exports = function(grunt) {
                     removeComments: true,
                     collapseWhitespace: true
                 },
-                files: [{
-                    expand: true,
-                    src: ['node_modules/bootstrap-buttons/*.perf.html'],
-                    dest: '.',
-                    ext: '.test.html',
-                }],
+                files: [],
             },
         },
         assemble: {
@@ -58,19 +53,26 @@ module.exports = function(grunt) {
 		},
 		telemetry: {
 			parentDir: [
-				"node_modules/topcoat-button-no-shadow/",
-				"node_modules/topcoat-button-box-shadow/"
+				"test/button"
 				],
 			testPages: [
-				"/test/perf/*.html"
+				"*.html"
 			],
 			css: [
-				"/css/*mobile-light.css"
+				"/css/*mobile-dark.*"
 			],
 			instances: 400,
 			minified: true,
 			repeat: 1
-		}
+		},
+		simplemocha: {
+			run_task: {
+				src: ['test/test.js']
+			},
+			page_sets: {
+				src: ['test/page_sets.test.js']
+			}
+		},
 	});
 
 	grunt.loadTasks('tasks/');
@@ -78,9 +80,11 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-htmlmin');
 	grunt.loadNpmTasks('grunt-contrib-copy');
 	grunt.loadNpmTasks('grunt-contrib-clean');
+	grunt.loadNpmTasks('grunt-simple-mocha');
 
 	grunt.registerTask('default', ['src', 'assemble-build', 'copy']);
 	grunt.registerTask('telemetry', ['run:telemetry:snapshot:True']);
+	grunt.registerTask('test', ['simplemocha:run_task', 'simplemocha:page_sets'])
 
 	grunt.registerTask('src', "Check & store CHROMIUM_SRC env var", function() {
 		if (!chromiumSrc) {

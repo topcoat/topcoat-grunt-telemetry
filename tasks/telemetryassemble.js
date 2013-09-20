@@ -36,7 +36,7 @@ function createTelemetryJSON (filename, min) {
 // Not ideal. Up to the user to provide an accurate pattern
 function getCSSFile (dir, cssFiles) {
 	return cssFiles.map(function (f) {
-		return expand(dir + f)[0];
+		return expand(path.join(dir, f))[0];
 	}).filter(function (x) {
 		return x;
 	})[0];
@@ -51,6 +51,7 @@ module.exports = function (grunt) {
 
 		var   pkgOptions  = grunt.config('telemetry')
 			, copyOpt     = grunt.config('copy')
+			, minOpt 	  = grunt.config('htmlmin')
 			, parentDir   = grunt.file.expand(pkgOptions.parentDir)
 			, chromiumSrc = process.env.CHROMIUM_SRC || ''
 			, assembleConfigs = grunt.config('assemble')
@@ -68,7 +69,7 @@ module.exports = function (grunt) {
 		parentDir.forEach(function (dir) {
 			pkgOptions.testPages.forEach(function (pattern) {
 
-				var matches = grunt.file.expand(dir + pattern);
+				var matches = grunt.file.expand(path.join(dir, pattern));
 
                 // If found parent dir will be copied to telemetry
 				if (matches.length) {
@@ -78,6 +79,14 @@ module.exports = function (grunt) {
 						src: dir + '/**',
 						dest: path.join(chromiumSrc, '/tools/perf/page_sets/topcoat/')
 					});
+
+					// Work in progress
+					// minOpt.telemetry.files.push({
+					// 	expand: true,
+					// 	src: [],
+					// 	dest: '.',
+					// 	ext: '.test.html',
+					// })
 
 					matches.forEach(function (f) {
 
@@ -107,9 +116,10 @@ module.exports = function (grunt) {
 		grunt.task.run('assemble');
 		grunt.task.run('copy');
 
-		if (pkgOptions.minified) {
-			grunt.task.run('htmlmin');
-		}
+		// Work in progress
+		// if (pkgOptions.minified) {
+		// 	grunt.task.run('htmlmin');
+		// }
 
 	});
 
