@@ -9,7 +9,8 @@ var   path = require('path')
 function createTelemetryJSON (filename, min) {
 
 	var name = path.basename(filename)
-      , jsonFilePATH = "perf/page_sets/" + name + '.json'
+	  , dirs = filename.split(path.sep)
+      , jsonFilePATH = "perf/page_sets/" + dirs[dirs.length - 2] + name + '.json'
       ;
 
 	var jsonContent = {
@@ -63,10 +64,6 @@ module.exports = function (grunt) {
         // Pass over the configurations to assemble
         // instances tells assemble how many times to repeat a component
 		assembleConfigs.options.instances = pkgOptions.instances;
-        
-        // All benchmark pages generated have a .perf. suffix
-        // They are ignored to keep the Grunt task from looping
-        pkgOptions.testPages.push("!*perf*");
 		
         // Checks all the parent dirs for perf file matches
 		parentDir.forEach(function (dir) {

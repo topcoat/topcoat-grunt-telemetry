@@ -7,9 +7,11 @@ describe('topcoat-grunt-telemetry', function () {
 
 	it('should generate the page sets json files', function () {
 
-		var actual = grunt.file.expand('perf/page_sets/buttonindex.html.perf.html.json');
+		var actual = grunt.file.expand('perf/page_sets/buttonindex.perf.html.json');
 		assert.equal(actual.length, 1, 'there should be a json file');
 
 	});
+
+	grunt.task.run('cleanz');
 
 })
