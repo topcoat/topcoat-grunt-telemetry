@@ -50,78 +50,75 @@ module.exports = function (grunt) {
 
 	grunt.registerTask('assemble-build', 'Generates test pages', function () {
 
-		var   pkgOptions  = grunt.config('telemetry')
-			, copyOpt     = grunt.config('copy')
-			, minOpt 	  = grunt.config('htmlmin')
-			, parentDir   = grunt.file.expand(pkgOptions.parentDir)
-			, chromiumSrc = process.env.CHROMIUM_SRC
-			, assembleConfigs = grunt.config('assemble')
-			;
+		if (process.env.CHROMIUM_SRC == null) {
+			grunt.task.run('src');
+		} else {
 
-		if (!chromiumSrc)
-			chromiumSrc = '/home/andrei/chromium/src/';
+			var   pkgOptions  = grunt.config('telemetry')
+				, copyOpt     = grunt.config('copy')
+				, minOpt 	  = grunt.config('htmlmin')
+				, parentDir   = grunt.file.expand(pkgOptions.parentDir)
+				, chromiumSrc = process.env.CHROMIUM_SRC
+				, assembleConfigs = grunt.config('assemble')
+				;
 
-        // Pass over the configurations to assemble
-        // instances tells assemble how many times to repeat a component
-		assembleConfigs.options.instances = pkgOptions.instances;
-		
-        // Checks all the parent dirs for perf file matches
-		parentDir.forEach(function (dir) {
-			pkgOptions.testPages.forEach(function (pattern) {
+			copyOpt.telemetry.files = [{
+				expand: true,
+				src: ['perf/**'],
+				dest: path.join(chromiumSrc, '/tools/') 
+			}]
 
-				var matches = grunt.file.expand(path.join(dir, pattern));
+	        // Pass over the configurations to assemble
+	        // instances tells assemble how many times to repeat a component
+			assembleConfigs.options.instances = pkgOptions.instances;
+			
+	        // Checks all the parent dirs for perf file matches
+			parentDir.forEach(function (dir) {
+				pkgOptions.testPages.forEach(function (pattern) {
 
-                // If found parent dir will be copied to telemetry
-				if (matches.length) {
+					var matches = grunt.file.expand(path.join(dir, pattern));
 
-					copyOpt.telemetry.files.push({
-						expand: true,
-						src: dir + '/**',
-						dest: path.join(chromiumSrc, '/tools/perf/page_sets/topcoat/')
-					});
+	                // If found parent dir will be copied to telemetry
+					if (matches.length) {
 
-					// Work in progress
-					// minOpt.telemetry.files.push({
-					// 	expand: true,
-					// 	src: [],
-					// 	dest: '.',
-					// 	ext: '.test.html',
-					// })
+						copyOpt.telemetry.files.push({
+							expand: true,
+							src: dir + '/**',
+							dest: path.join(chromiumSrc, '/tools/perf/page_sets/topcoat/')
+						});
 
-					matches.forEach(function (f) {
+						matches.forEach(function (f) {
 
-						var filename = path.join(path.dirname(f),path.basename(f, '.html') + '.perf.html');
-						console.log(filename);
-                        // Generate json file that points to perf html page
-						createTelemetryJSON(path.join(dir, path.basename(filename)), pkgOptions.minified);
-                        
-                        // tell assemble to create the perf page
-						assembleConfigs[path.basename(f)] = { files: {} };
-						assembleConfigs[path.basename(f)].files[filename] = f;
-						//console.log(assembleConfigs);
+							var filename = path.join(path.dirname(f),path.basename(f, '.html') + '.perf.html');
+							console.log(filename);
+	                        // Generate json file that points to perf html page
+							createTelemetryJSON(path.join(dir, path.basename(filename)), pkgOptions.minified);
+	                        
+	                        // tell assemble to create the perf page
+							assembleConfigs[path.basename(f)] = { files: {} };
+							assembleConfigs[path.basename(f)].files[filename] = f;
+							//console.log(assembleConfigs);
 
-                        // find the relative path to the CSS for the perf page
-						var css = getCSSFile(dir, pkgOptions.css);
-						assembleConfigs[path.basename(f)].options = {
-							style: path.relative(dir, css)
-						};
-					});
+	                        // find the relative path to the CSS for the perf page
+							var css = getCSSFile(dir, pkgOptions.css);
+							assembleConfigs[path.basename(f)].options = {
+								style: path.relative(dir, css)
+							};
+						});
 
-				}
+					}
+				});
 			});
-		});
 
-		grunt.config('copy', copyOpt);
+			grunt.config('copy', copyOpt);
 
-		grunt.config('assemble', assembleConfigs);
+			grunt.config('assemble', assembleConfigs);
 
-		grunt.task.run('assemble');
-		grunt.task.run('copy');
+			grunt.task.run('assemble');
+			grunt.task.run('copy');
+			
+		}
 
-		// Work in progress
-		// if (pkgOptions.minified) {
-		// 	grunt.task.run('htmlmin');
-		// }
 
 	});
 

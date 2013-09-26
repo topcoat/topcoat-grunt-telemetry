@@ -14,11 +14,7 @@ module.exports = function(grunt) {
 	grunt.initConfig({
 		pkg: grunt.file.readJSON('package.json'),
 		copy: {
-			telemetry: {
-				files: [
-					{ expand: true, src: ['perf/**'], dest: path.join(chromiumSrc, '/tools/') }
-				]
-			},
+			telemetry: {},
 			options: {
 				force: true
 			}
@@ -26,8 +22,7 @@ module.exports = function(grunt) {
 		clean: {
 			telemetry: {
 				src : [
-					'perf/page_sets/*', chromiumSrc + '/tools/perf/page_sets/topcoat',
-					chromiumSrc + '/tools/perf/page_sets/topcoat_*.json',
+					'perf/page_sets/*',
 					'/tmp/loading*',
 					'/tmp/smoothness*'
 				],
@@ -58,18 +53,18 @@ module.exports = function(grunt) {
 			}
 		},
 		telemetry: {
-			parentDir: [
+			"parentDir": [
 				"test/button"
-				],
-			testPages: [
+			],
+			"testPages": [
 				"*.html"
 			],
-			css: [
-				"/css/*mobile-dark.*"
+			"css": [
+				"css/topcoat-mobile-dark.min.css"
 			],
-			instances: 400,
-			minified: true,
-			repeat: 1
+			"instances": 400,
+			"minified": true,
+			"repeat": 1
 		},
 		simplemocha: {
 			run_task: {
@@ -91,8 +86,8 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-clean');
 	grunt.loadNpmTasks('grunt-simple-mocha');
 
-	grunt.registerTask('default', ['cleanz','assemble-build']);
+	grunt.registerTask('default', ['cleanz','assemble-build', 'telemetry']);
 	grunt.registerTask('telemetry', ['run:telemetry:snapshot:True']);
-	grunt.registerTask('test', ['simplemocha:run_task', 'simplemocha:page_sets', 'simplemocha:cleanz'])
+	grunt.registerTask('test', ['simplemocha:run_task', 'simplemocha:page_sets', 'simplemocha:cleanz']);
 
 };
