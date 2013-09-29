@@ -10,7 +10,13 @@ module.exports = function(grunt) {
 		grunt.log.warn('Make sure process.env.CHROMIUM_SRC is set up');
 		grunt.fail.warn('Export the path to the env');
 	}
-	
+
+  var chr = chromiumSrc.split('').pop();
+  if (chr != '/') {
+     grunt.log.fail('Invalid path to chromium src');
+     grunt.log.warn('Chromium src must end with \/');
+  }
+
 	grunt.initConfig({
 		pkg: grunt.file.readJSON('package.json'),
 		copy: {
